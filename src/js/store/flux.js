@@ -1,42 +1,97 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			people: {},
+			peopleDetails: {},
+			species: {},
+			speciesDetails: {},
+			planets: {},
+			planetsDetails: {},
+			favourites: []
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			getPeople: () => {
+				fetch("https://www.swapi.tech/api/people?page=1&limit=100", { method: "GET" })
+					.then(function(response) {
+						if (!response.ok) {
+							throw Error(response.statusText);
+						}
+						return response.json();
+					})
+					.then(function(responseAsJson) {
+						setStore({ people: responseAsJson });
+					});
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+			getPeopleDetails: uid => {
+				fetch("https://www.swapi.tech/api/people/".concat(uid), { method: "GET" })
+					.then(function(response) {
+						if (!response.ok) {
+							throw Error(response.statusText);
+						}
+						return response.json();
+					})
+					.then(function(responseAsJson) {
+						console.log(responseAsJson, "joder");
+						setStore({ peopleDetails: responseAsJson });
+					});
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+			getSpecies: async () => {
+				try {
+					let response = await fetch("https://www.swapi.tech/api/species?page=1&limit=100");
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
+					if (response.ok) {
+						let responseAsJson = await response.json();
+						setStore({ species: responseAsJson });
+					} else {
+						throw new Error(response.statusText, "code:", response.status);
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			},
+			getSpeciesDetails: uid => {
+				fetch("https://www.swapi.tech/api/species/".concat(uid), { method: "GET" })
+					.then(function(response) {
+						if (!response.ok) {
+							throw Error(response.statusText);
+						}
+						return response.json();
+					})
+					.then(function(responseAsJson) {
+						console.log(responseAsJson, "joder");
+						setStore({ speciesDetails: responseAsJson });
+					});
+			},
+			getPlanets: () => {
+				fetch("https://www.swapi.tech/api/planets?page=1&limit=100", { method: "GET" })
+					.then(function(response) {
+						if (!response.ok) {
+							throw Error(response.statusText);
+						}
+						return response.json();
+					})
+					.then(function(responseAsJson) {
+						setStore({ planets: responseAsJson });
+					});
+			},
+			getPlanetsDetails: uid => {
+				fetch("https://www.swapi.tech/api/planets/".concat(uid), { method: "GET" })
+					.then(function(response) {
+						if (!response.ok) {
+							throw Error(response.statusText);
+						}
+						return response.json();
+					})
+					.then(function(responseAsJson) {
+						console.log(responseAsJson);
+						setStore({ planetsDetails: responseAsJson });
+					});
+			},
+			setFavourites: name => {
+				setStore({
+					favourites: [...getStore().favourites, name]
 				});
-
-				//reset the global store
-				setStore({ demo: demo });
+				console.log(getStore().favourites);
 			}
 		}
 	};
